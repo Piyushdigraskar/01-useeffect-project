@@ -1,5 +1,5 @@
 import React, { useState, useReducer } from 'react';
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 import AuthContext from '../../Store/auth-context';
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
@@ -102,14 +102,30 @@ const Login = (props) => {
     dispatchCollegeName({ type: 'Input_Blur' })
   }
   const authCtx = useContext(AuthContext);
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
+  const collegeInputRef = useRef();
+
+
+
   const submitHandler = (event) => {
     event.preventDefault();
-    authCtx.onLogin(emailState.value, passwordState.value, collegeNameState.value);
+    if (formIsValid) {
+      authCtx.onLogin(emailState.value, passwordState.value, collegeNameState.value);
+    }
+    else if (!emailState.isValid) {
+      emailInputRef.current.focus();
+    } else if (!passwordState.isValid) {
+      passwordInputRef.current.focus();
+    } else {
+      collegeInputRef.current.focus();
+    }
   };
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <Input
+          ref={emailInputRef}
           id='email'
           type="email"
           label="E-Mail"
@@ -118,6 +134,7 @@ const Login = (props) => {
           onBlur={validateEmailHandler}
         ></Input>
         <Input
+          ref={passwordInputRef}
           id='password'
           type="password"
           label="Password"
@@ -126,6 +143,7 @@ const Login = (props) => {
           onBlur={validatePasswordHandler}
         ></Input>
         <Input
+          ref={collegeInputRef}
           id='collegename'
           type="collegename"
           label="College Name"
@@ -134,7 +152,7 @@ const Login = (props) => {
           onBlur={validateCollegeNameHandler}
         ></Input>
         <div className={classes.actions}>
-          <Button type="submit" className={classes.btn} disabled={!formIsValid}>
+          <Button type="submit" className={classes.btn}>
             Login
           </Button>
         </div>
